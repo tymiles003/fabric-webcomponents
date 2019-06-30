@@ -107,6 +107,17 @@
 <script>
     const template = document.getElementById("fluid-spinbutton");
 
+/*
+Spinbutton to iterate through numbers.
+Available attributes:
+startValue: Numeric value that specifies the value of the input box when the element is initialised. Default is 0.
+step: Numeric value that specifies which number should be added/substracted each time someone presses the up or down key. Also autocorrects all input to be a multiple of the current value (e.g. if you have a startValue of 1 and a step of 3 and enter the number 5, it would get corrected to 4).
+noTextInput: Prohibits any text input by the user. Forces him to use the Arrow keys or the Up and Down key.
+onlyPositive: Prohibits any value less than 0.
+disabled: Applies a disabled style to the element. Also prohibits any user input.
+suffix: string that gets appended to the numeric value.
+
+*/
     class SpinButton extends HTMLElement {
         constructor() {
             super();
@@ -115,11 +126,7 @@
         }
 
         static get observedAttributes() {
-            return ["options", "step"];
-        }
-
-        get options() {
-            return this.getAttribute("options");
+            return ["step"];
         }
         get step() {
             return this.getAttribute("step");

@@ -210,6 +210,28 @@
     const template = document.getElementById("fluid-textbox");
 
     //TODO masks
+    /*
+Textbox to enter text.
+Available attributes:
+readonly: Prohibits any user input. Keeps the default style.
+disabled: Prohibits any user input. Applies a special disabled style.
+required: Adds an asterix to the end of the input box.
+placeholder: String value that allows to set a default placeholder into the input box. Behaves like a standard <input placeholder=""> attribute.
+error: Displays a custom error message, set through a slot. Applies an error style.
+maxLength: Numeric value that sets a maximum number of chars that can be entered into the textbox. If a too long text is pasted, only those chars that can fit into the textbox get copied.
+multiline: Specifies that this textbox should use a textbox instead of the default input field.
+multilineAfter: Numeric value that specifies after how many chars an input field should be converted into a textarea field.
+autoExpand: Specifies that the textbox should always be as big as its content (meaning you will never scroll inside of the textfield).
+prefix: Indicates that this textbox has a prefix label. Needs the according slot to behave correctly.
+suffix: Indicates that this textbox has a suffix label. Needs the according slot to behave correctly.
+underline: Gives an alternative style to the textbox.
+borderless: Gives an alternative style to the textbox.
+
+Available slots:
+prefix: Sets the content of the prefix label.
+suffix: Sets the content of the suffix label.
+error: Sets the content of the error message.
+    */
     class Textbox extends HTMLElement {
         constructor() {
             super();
@@ -218,12 +240,9 @@
         }
 
         static get observedAttributes() {
-            return ['active', 'readonly', 'required', 'placeholder', 'error', "disabled", 'maxLength', 'multilineAfter'];
+            return [, 'readonly', 'required', 'placeholder', "disabled", 'maxLength', 'multilineAfter'];
         }
 
-        get active() {
-            return this.hasAttribute("active");
-        }
         get disabled() {
             return this.hasAttribute("disabled");
         }

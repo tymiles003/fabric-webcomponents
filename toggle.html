@@ -109,6 +109,17 @@
 <script>
     const template = document.getElementById("fluid-toggle");
 
+/*
+Toggle to indicate true (active) or false (inactive).
+Available attributes:
+active: Indicates visually that the toggle is active.
+inactive: Indicates visually that the toggle is inactive.
+disabled: Prohibits user input. Applies alternative style to element.
+
+Available slots:
+preLabel: Sets a text before the toggle.
+followLabel: Sets a text after the toggle.
+*/
     class Toggle extends HTMLElement {
         constructor() {
             super();
