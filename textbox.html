@@ -1,0 +1,349 @@
+<template id="fluid-textbox">
+    <style>
+        :host {
+            user-select: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .container {
+            width: 100%;
+            display: flex;
+            vertical-align: baseline;
+        }
+
+        .inputField {
+            width: 100%;
+            display: flex;
+        }
+
+        input {
+            display: inline-block;
+            -webkit-font-smoothing: antialiased;
+            font-size: 14px;
+            font-weight: 400;
+            height: 32px;
+            width: inherit;
+            margin: 0;
+            padding: 0 8px;
+            color: rgb(32, 31, 30);
+            text-overflow: ellipsis;
+            background: white;
+            outline: 0;
+            border-radius: 2px;
+            border-color: rgb(138, 136, 134);
+            border-width: 1px;
+            border-style: solid;
+        }
+
+        textarea {
+            display: none;
+        }
+
+        .prefix,
+        .suffix {
+            display: none;
+        }
+
+        input::placeholder {
+            color: rgb(32, 31, 30);
+        }
+
+        #required {
+            padding-left: 5px;
+            color: rgb(164, 38, 44);
+            display: none;
+        }
+
+        slot#error {
+            display: none;
+            font-size: 12px;
+            font-weight: 400;
+            color: rgb(164, 38, 44);
+            padding: 0;
+            padding-top: 5px;
+            margin: 0;
+        }
+
+        :host([required]) #required {
+            display: block;
+        }
+
+        :host([error]) slot#error {
+            display: block;
+        }
+
+        :host([error]) input {
+            border-color: rgb(164, 38, 44);
+        }
+
+        :host([disabled]) input {
+            cursor: default;
+            color: rgb(161, 159, 157);
+            background: rgb(243, 242, 241);
+        }
+
+        :host([disabled]) input::placeholder {
+            color: rgb(161, 159, 157);
+        }
+
+        :host([readonly]) input {
+            cursor: default;
+        }
+
+        :host([underline]) input {
+            border: 0;
+            border-bottom: 1px solid;
+            border-radius: 0;
+            background: white;
+        }
+        :host([underline][multiline]) textarea {
+            border: 0;
+            border-bottom: 1px solid;
+            border-radius: 0;
+            background: white;
+            outline: 0;
+        }
+
+        :host([borderless]) input {
+            border: 0;
+            border-radius: 0;
+            background: white;
+        }
+        :host([borderless][multiline]) textarea {
+            border: 0;
+            background: white;
+            outline: 0;
+        }
+
+        :host([prefix]) input {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            border-left: 0;
+        }
+
+        :host([suffix]) input {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            border-right: 0;
+        }
+
+        :host([prefix]) .inputField .prefix {
+            background: rgb(243, 242, 241);
+            color: rgb(96, 94, 92);
+            border: 1px solid;
+            border-radius: 2px;
+            border-right: 0;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            border-color: rgb(138, 136, 134);
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            white-space: nowrap;
+        }
+
+        :host([suffix]) .inputField .suffix {
+            background: rgb(243, 242, 241);
+            color: rgb(96, 94, 92);
+            border: 1px solid;
+            border-radius: 2px;
+            border-left: 0;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            border-color: rgb(138, 136, 134);
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            white-space: nowrap;
+        }
+
+        :host([prefix][disabled]) .prefix,
+        :host([suffix][disabled]) .suffix {
+            color: rgb(161, 159, 157);
+        }
+
+        :host([multiline]) input,
+        :host([multiline]) .prefix,
+        :host([multiline]) .suffix {
+            display: none;
+        }
+
+        :host([multiline]) textarea {
+            display: block;
+            font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+            min-height: 60px;
+            border-width: 1px;
+            border-style: solid;
+            border-image: initial;
+            background: rgb(255, 255, 255);
+            border-radius: 2px;
+            border-color: rgb(138, 136, 134);
+            padding: 6px 8px;
+            color: rgb(32, 31, 30);
+            line-height: 17px;
+            text-overflow: ellipsis;
+            width: 100%;
+            font-size: 14px;
+            font-weight: 400;
+        }
+    </style>
+    <div class="container">
+        <div class="inputField">
+            <slot name="prefix" class="prefix"></slot>
+            <input type="text">
+            <textarea></textarea>
+            <slot name="suffix" class="suffix"></slot>
+        </div>
+        <span id="required">*</span>
+    </div>
+    <slot name="description"></slot>
+    <slot name="errorMessage" id="error"></slot>
+</template>
+
+<script>
+    const template = document.getElementById("fluid-textbox");
+
+    //TODO masks
+    class Textbox extends HTMLElement {
+        constructor() {
+            super();
+            let shadowRoot = this.attachShadow({ mode: 'open' });
+            shadowRoot.appendChild(template.content.cloneNode(true));
+        }
+
+        static get observedAttributes() {
+            return ['active', 'readonly', 'required', 'placeholder', 'error', "disabled", 'maxLength', 'multilineAfter'];
+        }
+
+        get active() {
+            return this.hasAttribute("active");
+        }
+        get disabled() {
+            return this.hasAttribute("disabled");
+        }
+        get readonly() {
+            return this.hasAttribute("readonly");
+        }
+        get placeholder() {
+            return this.getAttribute("placeholder");
+        }
+        get required() {
+            return this.hasAttribute("required");
+        }
+        get maxLength() {
+            return this.getAttribute("maxLength");
+        }
+        get maxLengthAsInt() {
+            if (parseInt(this.getAttribute("maxLength")) != NaN) return this.getAttribute("maxLength");
+            else throw "maxLength Attribute is not a number!";
+        }
+        get prefix() {
+            return this.hasAttribute("prefix");
+        }
+        get suffix() {
+            return this.hasAttribute("suffix");
+        }
+        get autoExpand() {
+            return this.hasAttribute("autoExpand");
+        }
+        get multiline() {
+            return this.hasAttribute("multiline");
+        }
+        get multilineAfter() {
+            return this.getAttribute("multilineAfter");
+        }
+
+        set placeholder(string) {
+            this.setAttribute("placeholder", string);
+        }
+        set maxLength(string) {
+            this.setAttribute("maxLength", string)
+        }
+
+        connectedCallback() {
+            if (this.disabled) {
+                this.shadowRoot.querySelector("input").setAttribute("disabled", true);
+            }
+            if (this.placeholder) {
+                this.shadowRoot.querySelector("input").setAttribute("placeholder", this.placeholder);
+            }
+            if (this.readonly) {
+                this.shadowRoot.querySelector("input").setAttribute("readonly", true);
+            }
+            if (this.multilineAfter != null) {
+                this.addEventListener("input", this.checkMultiline);
+            }
+            if ((this.multilineAfter != null || this.multiline) && this.autoExpand) {
+                this.shadowRoot.querySelector("textarea").style.height = "60px";
+                this.addEventListener("input", this.adjustHeight);
+            }
+            if (this.maxLength != null) {
+                try {
+                    this.addEventListener("keyup", this.checkLimit);
+                    this.addEventListener("keydown", this.checkLimit);
+                }
+                catch (e) { }
+            }
+        }
+
+        checkLimit(e) {
+            if (!(e.key == "Backspace" || e.key == "Delete") && !(this.shadowRoot.querySelector("input").value.length <= this.maxLengthAsInt - 1)) {
+                this.shadowRoot.querySelector("input").value = this.shadowRoot.querySelector("input").value.substring(0, this.maxLengthAsInt);
+                e.preventDefault();
+            }
+        }
+        checkMultiline() {
+            if (this.multilineAfter != null) {
+                var input = this.shadowRoot.querySelector("input");
+                if (input.value.length < this.multilineAfter) return false;
+                else if (input.value.length >= this.multilineAfter) {
+                    this.setAttribute("multiline", true);
+                    this.shadowRoot.querySelector("textarea").value = input.value;
+                    this.shadowRoot.querySelector("textarea").focus();
+                    this.removeEventListener("input", this.checkMultiline);
+                    this.removeEventListener("input", this.checkMultiline, true);
+                    this.removeAttribute("multilineAfter");
+                    return true;
+                }
+            }
+            return true;
+        }
+        adjustHeight(e) {
+            if (this.checkMultiline()) {
+                var textarea = this.shadowRoot.querySelector("textarea");
+                textarea.style.height = 0;
+                textarea.style.height = textarea.scrollHeight + 5 + "px";
+            }
+        }
+    }
+
+    customElements.define("fluid-textbox", Textbox);
+
+</script>
+
+<fluid-textbox required placeholder="This is a test"></fluid-textbox>
+<fluid-textbox disabled placeholder="This is a test"></fluid-textbox>
+<fluid-textbox readonly></fluid-textbox>
+<fluid-textbox error>
+    <span slot="errorMessage">This is not correct!</span>
+</fluid-textbox>
+<fluid-textbox maxLength="5"></fluid-textbox>
+<fluid-textbox borderless></fluid-textbox>
+<fluid-textbox borderless disabled placeholder="This is disabled"></fluid-textbox>
+<fluid-textbox borderless readonly placeholder="This is readonly"></fluid-textbox>
+<fluid-textbox underline multilineAfter="10"></fluid-textbox>
+<fluid-textbox underline disabled placeholder="This is disabled"></fluid-textbox>
+<fluid-textbox underline readonly placeholder="This is readonly"></fluid-textbox>
+<fluid-textbox prefix suffix required disabled>
+    <span slot="prefix">Some</span>
+    <span slot="suffix">Thing</span>
+</fluid-textbox>
+<fluid-textbox multiline autoexpand></fluid-textbox>
+<fluid-textbox multilineAfter="10"></fluid-textbox>
+<fluid-textbox multilineAfter="10" autoexpand></fluid-textbox>

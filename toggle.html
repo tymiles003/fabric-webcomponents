@@ -1,0 +1,163 @@
+<template id="fluid-toggle">
+    <style>
+        :host {
+            user-select: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+            font-size: 14px;
+        }
+
+        .wrapper {
+            width: 32px;
+            display: inline-flex;
+            align-items: center;
+            height: 18px;
+            cursor: pointer;
+            padding: 0 3px;
+            border-radius: 10px;
+            outline: transparent;
+            transition: all .1s ease 0s;
+            border-width: 1px;
+            border-style: solid;
+            background: white;
+            border-color: rgb(96, 94, 92);
+        }
+
+        :host([inactive]) .wrapper:hover {
+            border-color: black;
+        }
+
+        :host([inactive]) .wrapper:hover .thumb {
+            background-color: black;
+        }
+
+        :host([active]) .wrapper {
+            background: rgb(0, 120, 212);
+            border-color: rgb(0, 120, 212);
+        }
+
+        :host([active]) .thumb {
+            background-color: white;
+            margin-left: auto;
+        }
+
+        .thumb {
+            margin-left: 0;
+            background-color: rgb(96, 94, 92);
+            width: 12px;
+            height: 12px;
+            border-radius: 12px;
+            transition: all .1s ease 0s;
+        }
+
+        :host([disabled][active]) .wrapper {
+            cursor: default;
+            background: rgb(200, 198, 196);
+            border-color: rgb(200, 198, 196);
+        }
+
+        :host([disabled][active]) .thumb {
+            background: rgb(243, 242, 241);
+        }
+
+        :host([disabled][inactive]) .wrapper,
+        :host([disabled][inactive]) .wrapper:hover {
+            cursor: default;
+            background: white;
+            border-color: rgb(200, 198, 196);
+        }
+
+        :host([disabled][inactive]) .thumb,
+        :host([disabled][inactive]) .wrapper:hover .thumb {
+            background: rgb(200, 198, 196);
+        }
+
+        .statusIndicator {
+            margin: 0 8px;
+            display: inline-block;
+        }
+        .label {
+            color: rgb(50, 49, 48);
+            padding: 5px 0;
+            overflow-wrap: break-word;
+            display: inline-block;
+            font-weight: 600;
+        }
+        .label.pre {
+            margin-right: 16px;
+        }
+        .label.follow {
+            margin-left: 16px;
+        }
+
+        :host([disabledStatusIndicator]) .statusIndicator {
+            display: none;
+        }
+    </style>
+    <slot name="preLabel" class="label pre"></slot>
+    <div class="wrapper">
+        <div class="thumb">
+        </div>
+    </div>
+    <div class="statusIndicator"></div>
+    <slot name="followLabel" class="label follow"></slot>
+</template>
+
+<script>
+    const template = document.getElementById("fluid-toggle");
+
+    class Toggle extends HTMLElement {
+        constructor() {
+            super();
+            let shadowRoot = this.attachShadow({ mode: 'open' });
+            shadowRoot.appendChild(template.content.cloneNode(true));
+        }
+
+        static get observedAttributes() {
+            return ['active', "disabled"];
+        }
+
+        get active() {
+            return this.hasAttribute("active");
+        }
+        get disabled() {
+            return this.hasAttribute("disabled");
+        }
+        connectedCallback() {
+            if (!this.active) {
+                this.setAttribute("inactive", "");
+                this.shadowRoot.querySelector(".statusIndicator").innerHTML = "Off";
+            }
+            else {
+                this.shadowRoot.querySelector(".statusIndicator").innerHTML = "On";
+            }
+            this.addEventListener('click', this._toggleBox);
+        }
+        _toggleBox() {
+            if (!this.disabled) {
+                if (this.active) {
+                    this.removeAttribute("active");
+                    this.setAttribute("inactive", "");
+                    this.shadowRoot.querySelector(".statusIndicator").innerHTML = "Off";
+                }
+                else {
+                    this.removeAttribute("inactive");
+                    this.setAttribute("active", "");
+                    this.shadowRoot.querySelector(".statusIndicator").innerHTML = "On";
+                }
+            }
+        }
+    }
+
+    customElements.define("fluid-toggle", Toggle);
+</script>
+
+<fluid-toggle>
+    <p slot="preLabel">I'm before the text!</p>
+    <p slot="followLabel">I'm following the button!</p>
+</fluid-toggle>
+<fluid-toggle disabled></fluid-toggle>
+<fluid-toggle disabled active></fluid-toggle>

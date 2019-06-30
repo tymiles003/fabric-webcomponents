@@ -1,0 +1,232 @@
+<template id="fluid-spinbutton">
+    <style>
+        :host {
+            user-select: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .button {
+            display: flex;
+            box-sizing: border-box;
+            height: 32px;
+            min-width: 86px;
+            border-width: 1px;
+            border-style: solid;
+            border-color: rgb(138, 136, 134);
+            border-radius: 2px;
+            padding-left: 10px;
+        }
+
+        input {
+            width: 100%;
+            border: 0;
+            outline: 0;
+        }
+
+        .spinners {
+            width: 30px;
+        }
+
+        .spinner {
+            height: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner:hover {
+            background-color: rgb(243, 242, 241);
+        }
+
+        .up {
+            transform: rotateX(180deg);
+        }
+
+        svg {
+            width: 8px;
+        }
+
+        :host([disabled]) .button, :host([disabled]) input {
+            color: rgb(161, 159, 157);
+            background-color: rgb(243, 242, 241);
+            cursor: default;
+            
+        }
+        :host([disabled]) path {
+            fill: rgb(161, 159, 157);
+        }
+    </style>
+
+    <div class="button">
+        <input type="text">
+        <div class="spinners">
+            <div class="spinner up">
+                <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+                <!-- Generator: Gravit.io --><svg xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink" style="isolation:isolate" viewBox="0 0 11.314 7.071"
+                    width="11.314pt" height="7.071pt">
+                    <defs>
+                        <clipPath id="_clipPath_B5uHQiXh7ULF3O5yQMoHYdrv3S7RgXPg">
+                            <rect width="11.314" height="7.071" />
+                        </clipPath>
+                    </defs>
+                    <g clip-path="url(#_clipPath_B5uHQiXh7ULF3O5yQMoHYdrv3S7RgXPg)">
+                        <path
+                            d=" M 4.95 6.364 L 5.657 7.071 L 11.314 1.414 L 9.9 0 L 5.657 4.242 L 1.414 0 L 0 1.414 L 4.95 6.364 Z "
+                            fill="rgb(0,0,0)" />
+                    </g>
+                </svg>
+            </div>
+            <div class="spinner down">
+                <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+                <!-- Generator: Gravit.io --><svg xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink" style="isolation:isolate" viewBox="0 0 11.314 7.071"
+                    width="11.314pt" height="7.071pt">
+                    <defs>
+                        <clipPath id="_clipPath_B5uHQiXh7ULF3O5yQMoHYdrv3S7RgXPg">
+                            <rect width="11.314" height="7.071" />
+                        </clipPath>
+                    </defs>
+                    <g clip-path="url(#_clipPath_B5uHQiXh7ULF3O5yQMoHYdrv3S7RgXPg)">
+                        <path
+                            d=" M 4.95 6.364 L 5.657 7.071 L 11.314 1.414 L 9.9 0 L 5.657 4.242 L 1.414 0 L 0 1.414 L 4.95 6.364 Z "
+                            fill="rgb(0,0,0)" />
+                    </g>
+                </svg>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    const template = document.getElementById("fluid-spinbutton");
+
+    class SpinButton extends HTMLElement {
+        constructor() {
+            super();
+            let shadowRoot = this.attachShadow({ mode: 'open' });
+            shadowRoot.appendChild(template.content.cloneNode(true));
+        }
+
+        static get observedAttributes() {
+            return ["options", "step"];
+        }
+
+        get options() {
+            return this.getAttribute("options");
+        }
+        get step() {
+            return this.getAttribute("step");
+        }
+        get startValue() {
+            return this.getAttribute("startValue");
+        }
+        get noTextInput() {
+            return this.hasAttribute("noTextInput");
+        }
+        get onlyPositive() {
+            return this.hasAttribute("onlyPositive");
+        }
+        get disabled() {
+            return this.hasAttribute("disabled");
+        }
+        get suffix() {
+            return this.getAttribute("suffix");
+        }
+
+        connectedCallback() {
+            this.startValue == null ? this.counter = 0 : this.counter = parseInt(this.startValue);
+            this.step == null ? this.countStep = 1 : this.countStep = parseInt(this.step);
+            this.suffix == null ? this.suf = "" : this.suf = " " + this.suffix;
+            if(this.disabled) this.shadowRoot.querySelector("input").setAttribute("disabled",true);
+            if (!this.noTextInput) {
+                this.addEventListener("keydown", this.checkNumber);
+                this.addEventListener("keyup", this.checkNumber);
+            }
+            this.addEventListener("keydown", this.count);
+            this.addEventListener("click", this.count);
+
+            this.render(this.counter);
+            //this.shadowRoot.querySelectorAll(".spinner").forEach(el => el.addEventListener("click", this.count));
+            //Set up count logic
+        }
+
+        render(val) {
+            this.shadowRoot.querySelector("input").value = val + this.suf;
+        }
+
+        iterateOptions() {
+            var optionList = this.options.split(";");
+            return optionList[optionList.length % this.counter];
+        }
+
+        count(e) {
+            if(this.disabled) {
+                e.preventDefault();
+                return;
+            }
+            if (e.type == "keydown") {
+                if (e.code == "ArrowUp") {
+                    this.counter += this.countStep;
+                }
+                else if (e.code == "ArrowDown") {
+                    if(!this.onlyPositive || (this.onlyPositive && this.counter - this.countStep >= 0 ))
+                    this.counter -= this.countStep;
+                }
+                else if (this.noTextInput) {
+                    e.preventDefault();
+                }
+            }
+            else if (e.type == "click") {
+                var target;
+                if (e.path[0].localName == "svg" || e.path[0].localName == "g" || e.path[0].localName == "path" || e.path[0].classList[0] == "spinner") {
+                    if (e.path[0].classList.contains("spinner")) target = e.path[0].classList[1];
+                    else if (e.path[1].classList.contains("spinner")) target = e.path[1].classList[1];
+                    else if (e.path[2].classList.contains("spinner")) target = e.path[2].classList[1];
+                    else if (e.path[3].classList.contains("spinner")) target = e.path[3].classList[1];
+                    if (target) {
+                        if (target == "up") {
+                            this.counter += this.countStep;
+                        }
+                        else if(!this.onlyPositive || (this.onlyPositive && this.counter - this.countStep >= 0 )) {
+                            this.counter -= this.countStep;
+                            }
+                    }
+                }
+
+            }
+            this.render(this.counter);
+
+        }
+
+        checkNumber(e) {
+            if (!(e.code.includes("Digit") || e.code.includes("Arrow") || e.key == "Backspace" || e.key == "Delete")) {
+                e.preventDefault();
+            }
+            this.counter = parseInt(this.shadowRoot.querySelector("input").value);
+            if (this.counter % this.countStep != 0) this.counter -= this.counter % this.countStep;
+
+            this.render(this.trimLeadingZeros(this.counter.toString()));
+        }
+        trimLeadingZeros(numberString) {
+            if (numberString == "") return "0";
+            if (numberString.length == 1) return numberString;
+            while (numberString.charAt(0) == '0') {
+                numberString = numberString.substring(1);
+            }
+            return numberString;
+        }
+    }
+    customElements.define("fluid-spinbutton", SpinButton);
+</script>
+
+<fluid-spinbutton startValue="5" step="3" noTextInput></fluid-spinbutton>
+<fluid-spinbutton step="3"></fluid-spinbutton>
+<fluid-spinbutton noTextInput onlyPositive disabled></fluid-spinbutton>
+<fluid-spinbutton suffix="cm"></fluid-spinbutton>
